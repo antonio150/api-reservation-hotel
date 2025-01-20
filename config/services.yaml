@@ -6,6 +6,24 @@
 parameters:
 
 services:
+    App\Controller\UploadImageController:
+        arguments:
+            $serializer: '@serializer'
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    App\OpenApi\OpenApiDecorator:
+        decorates: 'api_platform.openapi.factory'
+
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%kernel.project_dir%/public/uploads'
+
+    App\Command\CreateUserCommand:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $passwordHasher: '@security.password_hasher'
+        tags: ['console.command']
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
