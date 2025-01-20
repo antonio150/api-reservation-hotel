@@ -18,5 +18,10 @@ Pour voir la liste des routes qui se trouve dans cet application
 symfony console debug:router
 ```
 
+Cet application est sécurisé, et pour ajouter un nouvel utilisateur pour la premiere fois.
+Saisie la commande ci-dessous
 
 
+```bash
+symfony console app:create-user anto@test.com password123
+```
