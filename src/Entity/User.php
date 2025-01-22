@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use App\Controller\UploadImageController;
 use App\Dto\UserFileInput;
@@ -11,11 +13,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ApiResource(
     operations: [
+        new GetCollection(  // Opération GET standard pour /api/hotels
+            normalizationContext: ['groups' => ['user:read']],
+            filters: ['name']  // Permet de filtrer sur le nom
+        ),
+        new Get(  // Ajout d'une opération POST pour la création d'un hôtel
+            uriTemplate: '/users/{id}', // Utilisation du paramètre {id}
+            normalizationContext: ['groups' => ['user:read']],
+        ),
         new Post(
             uriTemplate: '/users',
             controller: UploadImageController::class,
@@ -31,30 +42,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user:read', 'user:write'])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $fullname = null;
 
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'User')]
+    #[Groups(['user:read', 'user:write'])]
     private Collection $reservation;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $filePath = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $originalName = null;
 
     public function getId(): ?int
@@ -193,5 +211,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->originalName = $originalName;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->fullname ?? '';
     }
 }

@@ -6,6 +6,13 @@
 parameters:
 
 services:
+    App\Processor\ReservationProcessor:
+        tags: ['api_platform.state_processor']
+
+    App\EventSubscriber\ReservationSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber , event: postPersist }
+
     App\Controller\UploadImageController:
         arguments:
             $serializer: '@serializer'

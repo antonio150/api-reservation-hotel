@@ -3,12 +3,20 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Post(
+            processor: \App\Processor\ReservationProcessor::class
+        )
+    ]
+
+)]
 class Reservation
 {
     #[ORM\Id]
